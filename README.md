@@ -36,3 +36,11 @@
         "error": "A senha deve ter no minimo 6 caracteres"
     }  
     ```
+  
+- Response 400 (Bad Request) - Erros na validação - email existente
+  ```json
+  {
+      "campo": "email",
+      "error": "Email existente no banco de dados!"
+  }
+  ```

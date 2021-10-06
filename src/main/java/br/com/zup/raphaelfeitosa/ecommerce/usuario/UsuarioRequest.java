@@ -1,5 +1,7 @@
 package br.com.zup.raphaelfeitosa.ecommerce.usuario;
 
+import br.com.zup.raphaelfeitosa.ecommerce.validacoes.anotacoes.CampoUnicoGenerico;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -8,6 +10,7 @@ public class UsuarioRequest {
 
     @NotBlank
     @Email
+    @CampoUnicoGenerico(nomeCampo = "email", classeDominio = Usuario.class)
     private String email;
 
     @NotBlank(message = "A senha não pode ser em branco ou nula")

@@ -78,4 +78,22 @@ public class UsuarioControllerTest {
                         .status()
                         .is(400));
     }
+
+    @Test
+    @Order(4)
+    @DisplayName("400 - Erro email já cadastrado no banco de dados")
+    void deveriaDaErroDeEmailJaCadastradoComRetorno400() throws Exception {
+        UsuarioRequest emailJaExistente = new UsuarioRequest(
+                "john@gmail.com",
+                "123456"
+        );
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post(uri)
+                        .content(gson.toJson(emailJaExistente))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers
+                        .status()
+                        .is(400));
+    }
 }

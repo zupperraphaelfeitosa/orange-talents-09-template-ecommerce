@@ -1,4 +1,4 @@
-package br.com.zup.raphaelfeitosa.ecommerce.validacoes.anotacoes;
+package br.com.zup.raphaelfeitosa.ecommerce.validacao.anotacao;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

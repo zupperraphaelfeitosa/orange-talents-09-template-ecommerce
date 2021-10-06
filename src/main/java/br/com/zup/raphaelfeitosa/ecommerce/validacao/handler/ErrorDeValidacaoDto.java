@@ -1,4 +1,4 @@
-package br.com.zup.raphaelfeitosa.ecommerce.validacoes.handler;
+package br.com.zup.raphaelfeitosa.ecommerce.validacao.handler;
 
 public class ErrorDeValidacaoDto {
 

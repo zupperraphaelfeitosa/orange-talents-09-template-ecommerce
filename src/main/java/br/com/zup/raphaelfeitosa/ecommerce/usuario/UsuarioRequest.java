@@ -1,6 +1,6 @@
 package br.com.zup.raphaelfeitosa.ecommerce.usuario;
 
-import br.com.zup.raphaelfeitosa.ecommerce.validacoes.anotacoes.CampoUnicoGenerico;
+import br.com.zup.raphaelfeitosa.ecommerce.validacao.anotacao.CampoUnicoGenerico;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package br.com.zup.raphaelfeitosa.ecommerce.validacoes.handler;
+package br.com.zup.raphaelfeitosa.ecommerce.validacao.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

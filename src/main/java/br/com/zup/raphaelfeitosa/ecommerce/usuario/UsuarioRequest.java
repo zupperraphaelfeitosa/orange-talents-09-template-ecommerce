@@ -10,7 +10,10 @@ public class UsuarioRequest {
 
     @NotBlank
     @Email
-    @CampoUnicoGenerico(nomeCampo = "email", classeDominio = Usuario.class)
+    @CampoUnicoGenerico(
+            classeDominio = Usuario.class,
+            nomeCampo = "email",
+            message = "Email existente no banco de dados")
     private String email;
 
     @NotBlank(message = "A senha não pode ser em branco ou nula")

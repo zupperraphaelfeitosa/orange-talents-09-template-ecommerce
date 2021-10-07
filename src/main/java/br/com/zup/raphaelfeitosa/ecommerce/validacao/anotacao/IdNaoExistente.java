@@ -2,17 +2,18 @@ package br.com.zup.raphaelfeitosa.ecommerce.validacao.anotacao;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = {CampoUnicoValidador.class})
+@Constraint(validatedBy = {IdNaoExistenteValidador.class})
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CampoUnicoGenerico {
+public @interface IdNaoExistente {
+
     Class<?> classeDominio();
     String nomeCampo();
-    String message() default "cadastro existente no banco de dados";
+    String message() default "Cadastro não existente no banco de dados!";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
+
 }

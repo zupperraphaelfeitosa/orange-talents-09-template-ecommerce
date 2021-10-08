@@ -14,13 +14,14 @@ public class Categoria {
     private String nome;
 
     @ManyToOne
-    private Categoria categoria;
+    @JoinColumn(name = "id_categoria")
+    private Categoria categoriaMae;
 
     @Deprecated
     public Categoria(){}
 
-    public Categoria(String nome, Categoria categoria) {
+    public Categoria(String nome, Categoria categoriaMae) {
         this.nome = nome;
-        this.categoria = categoria;
+        this.categoriaMae = categoriaMae;
     }
 }

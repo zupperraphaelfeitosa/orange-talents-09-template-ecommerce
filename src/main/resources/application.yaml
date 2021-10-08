@@ -14,3 +14,8 @@ spring:
     url: jdbc:mysql://localhost:3306/mercado_livre_api_db?createDatabaseIfNotExist=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&sslMode=DISABLED
     username: root
     password: password
+
+ecommerce:
+  jwt:
+    secret: 99447632d2bfbc54519f409df043679231e08e4b
+    expiration: 86400000

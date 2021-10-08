@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -19,9 +20,9 @@ import javax.transaction.Transactional;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 @ActiveProfiles(value = "test")
-public class UsuarioControllerTest {
+public class UsuarioAutenticacaoControllerTest {
 
-    private final String uri = "/api/v1/usuarios";
+    private final String uri = "/api/v1/autenticacao";
 
     Gson gson = new Gson();
 
@@ -33,32 +34,32 @@ public class UsuarioControllerTest {
 
     @Test
     @Order(1)
-    @DisplayName("200 - Cadastro de um novo usuario")
-    void deveriaCadastrarUmNonoUsuarioComRetorno200() throws Exception {
+    @DisplayName("200 - usuario autenticado com sucesso")
+    @Transactional
+    void deveriaRealizarLoginComSucessoRetorno200() throws Exception {
 
-        UsuarioRequest novoUsuario = new UsuarioRequest(
-                "john@gmail.com",
-                "123456"
-        );
+        UsuarioRequest loginUsuario = new UsuarioRequest("johndoe@gmail.com", "123456");
+        entityManager.persist(loginUsuario.toUsuario());
 
-        mockMvc.perform(MockMvcRequestBuilders
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
-                        .content(gson.toJson(novoUsuario))
+                        .content(gson.toJson(loginUsuario))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers
                         .status()
-                        .is(200));
+                        .is(200)).andReturn();
+
+        Assertions.assertTrue(mvcResult.getResponse().getContentAsString().contains("Bearer"));
+
     }
 
     @Test
     @Order(2)
-    @DisplayName("400 - Erro email invalido")
-    void deveriaDaErroDeEmailInvalidoComRetorno400() throws Exception {
+    @DisplayName("400 - Error email invalido")
+    @Transactional
+    void deveriaRetornarErrorDeEmailInvalidoComRetorno400() throws Exception {
 
-        UsuarioRequest emailInvalido = new UsuarioRequest(
-                "emailinvalido.gmail.com",
-                "123456"
-        );
+        UsuarioRequest emailInvalido = new UsuarioRequest("johndoegmail.com", "123456");
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
@@ -71,37 +72,15 @@ public class UsuarioControllerTest {
 
     @Test
     @Order(3)
-    @DisplayName("400 - Erro senha com menos de 6 caracteres")
-    void deveriaDaErroDeSenhaComMenosDeSeisCaracteresComRetorno400() throws Exception {
-
-        UsuarioRequest senhaMenorQueSeisCaracteres = new UsuarioRequest(
-                "maria@gmail.com",
-                "12345"
-        );
-
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post(uri)
-                        .content(gson.toJson(senhaMenorQueSeisCaracteres))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers
-                        .status()
-                        .is(400));
-    }
-
-    @Test
-    @Order(4)
-    @DisplayName("400 - Erro email já cadastrado no banco de dados")
+    @DisplayName("400 - Error email ou senha em vazio ou nulo")
     @Transactional
-    void deveriaDaErroDeEmailJaCadastradoComRetorno400() throws Exception {
-        UsuarioRequest emailJaExistente = new UsuarioRequest(
-                "yuri@gmail.com",
-                "123456"
-        );
-        entityManager.persist(emailJaExistente.toUsuario());
+    void deveriaRetornarErrorDeEmailOuSenhaVazioOuNuloComRetorno400() throws Exception {
+
+        UsuarioRequest emailOuSenhaVazioOuNulo = new UsuarioRequest("", null);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
-                        .content(gson.toJson(emailJaExistente))
+                        .content(gson.toJson(emailOuSenhaVazioOuNulo))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers
                         .status()

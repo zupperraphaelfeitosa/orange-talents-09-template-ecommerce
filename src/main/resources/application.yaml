@@ -19,3 +19,6 @@ ecommerce:
   jwt:
     secret: 99447632d2bfbc54519f409df043679231e08e4b
     expiration: 86400000
+
+link:
+  fake: http://bucket.io/

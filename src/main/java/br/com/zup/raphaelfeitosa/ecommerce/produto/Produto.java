@@ -6,8 +6,9 @@ import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tb_produtos")
@@ -42,6 +43,9 @@ public class Produto {
 
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
+    private Set<ImagemProduto> imagens = new HashSet<>();
+
     @Deprecated
     public Produto() {
     }
@@ -55,5 +59,34 @@ public class Produto {
         this.caracteristicas = caracteristicas;
         this.categoria = categoria;
         this.usuario = usuario;
+    }
+
+    public void associaImagens(Set<String> links) {
+        Set<ImagemProduto> imagens = links.stream()
+                .map(link -> new ImagemProduto(this, link))
+                .collect(Collectors.toSet());
+        this.imagens.addAll(imagens);
+    }
+
+    public boolean pertenceAoUsuario(Optional<Usuario> possivelDonoDoProduto) {
+        return usuario.equals(possivelDonoDoProduto.get());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Produto produto = (Produto) o;
+
+        if (!nome.equals(produto.nome)) return false;
+        return usuario.equals(produto.usuario);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = nome.hashCode();
+        result = 31 * result + usuario.hashCode();
+        return result;
     }
 }

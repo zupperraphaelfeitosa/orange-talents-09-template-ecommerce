@@ -2,6 +2,7 @@ package br.com.zup.raphaelfeitosa.ecommerce.produto;
 
 import br.com.zup.raphaelfeitosa.ecommerce.categoria.Categoria;
 import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
+import br.com.zup.raphaelfeitosa.ecommerce.validacao.anotacao.CampoUnicoGenerico;
 import br.com.zup.raphaelfeitosa.ecommerce.validacao.anotacao.IdNaoExistente;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
@@ -16,10 +17,14 @@ import java.util.Objects;
 public class ProdutoRequest {
 
     @NotBlank(message = "nome não pode ser vazio ou nulo")
+    @CampoUnicoGenerico(classeDominio = Produto.class,
+            nomeCampo = "nome",
+            message = "Produto já cadastrado")
     private String nome;
 
     @NotNull(message = "valor nao pode ser nulo")
     @Positive(message = "valor tem que ser positivo")
+    @DecimalMin("0.01")
     private BigDecimal valor;
 
     @NotNull(message = "Quantidade não pode ser nula")

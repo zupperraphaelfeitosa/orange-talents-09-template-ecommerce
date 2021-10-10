@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,6 +36,19 @@ public class ErrorValidacaoHandler {
         objectErrors.forEach(erros -> {
             String mensagem = messageSource.getMessage(erros, LocaleContextHolder.getLocale());
             ErrorDeValidacaoDto error = new ErrorDeValidacaoDto(erros.getObjectName(), mensagem);
+            errorDeValidacaoDtoList.add(error);
+        });
+        return errorDeValidacaoDtoList;
+    }
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BindException.class)
+    public List<ErrorDeValidacaoDto> bindException(BindException exception) {
+        List<ErrorDeValidacaoDto> errorDeValidacaoDtoList = new ArrayList<>();
+        List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
+        fieldErrors.forEach(erros -> {
+            String mensagem = messageSource.getMessage(erros, LocaleContextHolder.getLocale());
+            ErrorDeValidacaoDto error = new ErrorDeValidacaoDto(erros.getField(), mensagem);
             errorDeValidacaoDtoList.add(error);
         });
         return errorDeValidacaoDtoList;

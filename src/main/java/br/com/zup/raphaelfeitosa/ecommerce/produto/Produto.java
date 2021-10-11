@@ -89,4 +89,12 @@ public class Produto {
         result = 31 * result + usuario.hashCode();
         return result;
     }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
 }

@@ -22,3 +22,7 @@ ecommerce:
 
 link:
   fake: http://bucket.io/
+
+email:
+  fake:
+    remetente: no-reply@ecommerce.com.br

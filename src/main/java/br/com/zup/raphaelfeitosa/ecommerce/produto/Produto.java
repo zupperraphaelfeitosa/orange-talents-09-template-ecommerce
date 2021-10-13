@@ -1,13 +1,16 @@
 package br.com.zup.raphaelfeitosa.ecommerce.produto;
 
 import br.com.zup.raphaelfeitosa.ecommerce.categoria.Categoria;
+import br.com.zup.raphaelfeitosa.ecommerce.imagem_produto.ImagemProduto;
+import br.com.zup.raphaelfeitosa.ecommerce.opiniao_produto.OpiniaoProduto;
+import br.com.zup.raphaelfeitosa.ecommerce.pergunta_produto.PerguntaProduto;
 import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collector;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Entity
@@ -46,6 +49,12 @@ public class Produto {
     @OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
     private Set<ImagemProduto> imagens = new HashSet<>();
 
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
+    private Set<OpiniaoProduto> opinioes = new HashSet<>();
+
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
+    private List<PerguntaProduto> perguntas = new ArrayList<>();
+
     @Deprecated
     public Produto() {
     }
@@ -72,6 +81,54 @@ public class Produto {
         return usuario.equals(possivelDonoDoProduto.get());
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public BigDecimal getValor() {
+        return valor;
+    }
+
+    public Integer getQuantidade() {
+        return quantidade;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public Map<String, String> getCaracteristicas() {
+        return caracteristicas;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public Set<ImagemProduto> getImagens() {
+        return imagens;
+    }
+
+    public Opinioes getOpinioes() {
+        return new Opinioes(this.opinioes);
+    }
+
+    public List<PerguntaProduto> getPerguntas() {
+        return perguntas;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -88,13 +145,5 @@ public class Produto {
         int result = nome.hashCode();
         result = 31 * result + usuario.hashCode();
         return result;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
     }
 }

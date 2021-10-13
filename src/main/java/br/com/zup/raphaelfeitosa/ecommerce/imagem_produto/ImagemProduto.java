@@ -1,12 +1,10 @@
-package br.com.zup.raphaelfeitosa.ecommerce.produto;
+package br.com.zup.raphaelfeitosa.ecommerce.imagem_produto;
 
-import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
+import br.com.zup.raphaelfeitosa.ecommerce.produto.Produto;
 import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
 @Entity
 @Table(name = "tb_imagens_produto")
@@ -31,6 +29,10 @@ public class ImagemProduto {
     public ImagemProduto(Produto produto, String link) {
         this.produto = produto;
         this.link = link;
+    }
+
+    public String getLink() {
+        return link;
     }
 
     @Override

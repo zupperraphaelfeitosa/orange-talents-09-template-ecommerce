@@ -1,4 +1,4 @@
-package br.com.zup.raphaelfeitosa.ecommerce.produto;
+package br.com.zup.raphaelfeitosa.ecommerce.imagem_produto;
 
 import org.springframework.web.multipart.MultipartFile;
 

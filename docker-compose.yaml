@@ -1,16 +1,38 @@
 version: '3.8'
+
 services:
+  mercado_livre_api:
+    build:
+      dockerfile: dockerfile
+      context: .
+    image: raphaelfeitosa/mercado_livre_api:1.0.0
+    restart: on-failure
+    container_name: mercado_livre_api
+    ports:
+      - "8081:8081"
+    networks:
+      - mercado_livre_api_network
+    depends_on:
+      - mercado_livre_api_db
+
   mercado_livre_api_db:
     image: mysql:latest
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     container_name: mercado_livre_api_db
     ports:
-      - 3306:3306
+      - "3306:3306"
+    networks:
+      - mercado_livre_api_network
     environment:
       - MYSQL_DATABASE=mercado_livre_api_db
       - MYSQL_ROOT_PASSWORD=password
     volumes:
-      - mysql-volume:/var/lib/mysql
+      - mysql-volume-ecommerce:/var/lib/mysql
+
+networks:
+  mercado_livre_api_network:
+    driver: bridge
+
 volumes:
-  mysql-volume:
+  mysql-volume-ecommerce:

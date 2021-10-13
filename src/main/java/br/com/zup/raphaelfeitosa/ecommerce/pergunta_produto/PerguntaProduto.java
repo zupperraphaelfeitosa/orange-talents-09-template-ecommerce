@@ -2,6 +2,7 @@ package br.com.zup.raphaelfeitosa.ecommerce.pergunta_produto;
 
 import br.com.zup.raphaelfeitosa.ecommerce.produto.Produto;
 import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class PerguntaProduto {
     private LocalDateTime dataDeCadastro = LocalDateTime.now();
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "id_produto", nullable = false)
     private Produto produto;
 
@@ -40,10 +42,6 @@ public class PerguntaProduto {
 
     public String getTitulo() {
         return titulo;
-    }
-
-    public LocalDateTime getDataDeCadastro() {
-        return dataDeCadastro;
     }
 
     public Produto getProduto() {

@@ -33,7 +33,6 @@ public class UsuarioControllerTest {
 
     @Test
     @Order(1)
-    @DisplayName("200 - Cadastro de um novo usuario")
     void deveriaCadastrarUmNonoUsuarioComRetorno200() throws Exception {
 
         UsuarioRequest novoUsuario = new UsuarioRequest(
@@ -52,7 +51,6 @@ public class UsuarioControllerTest {
 
     @Test
     @Order(2)
-    @DisplayName("400 - Erro email invalido")
     void deveriaDaErroDeEmailInvalidoComRetorno400() throws Exception {
 
         UsuarioRequest emailInvalido = new UsuarioRequest(
@@ -71,7 +69,6 @@ public class UsuarioControllerTest {
 
     @Test
     @Order(3)
-    @DisplayName("400 - Erro senha com menos de 6 caracteres")
     void deveriaDaErroDeSenhaComMenosDeSeisCaracteresComRetorno400() throws Exception {
 
         UsuarioRequest senhaMenorQueSeisCaracteres = new UsuarioRequest(
@@ -90,7 +87,6 @@ public class UsuarioControllerTest {
 
     @Test
     @Order(4)
-    @DisplayName("400 - Erro email já cadastrado no banco de dados")
     @Transactional
     void deveriaDaErroDeEmailJaCadastradoComRetorno400() throws Exception {
         UsuarioRequest emailJaExistente = new UsuarioRequest(

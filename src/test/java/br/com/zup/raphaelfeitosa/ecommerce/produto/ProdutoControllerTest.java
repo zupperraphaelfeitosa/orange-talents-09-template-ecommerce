@@ -1,7 +1,9 @@
 package br.com.zup.raphaelfeitosa.ecommerce.produto;
 
+import br.com.zup.raphaelfeitosa.ecommerce.categoria.Categoria;
 import br.com.zup.raphaelfeitosa.ecommerce.categoria.CategoriaRequest;
 import br.com.zup.raphaelfeitosa.ecommerce.config.security.TokenService;
+import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
 import br.com.zup.raphaelfeitosa.ecommerce.usuario.UsuarioAutenticacaoRequest;
 import br.com.zup.raphaelfeitosa.ecommerce.usuario.UsuarioRequest;
 import com.google.gson.Gson;
@@ -20,7 +22,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -32,6 +36,11 @@ public class ProdutoControllerTest {
     private final String uri = "/api/v1/produtos";
     private String tokenUsuarioUm;
     private String tokenUsuarioDois;
+    private Categoria categoria;
+    private Produto produto;
+    private Usuario usuarioUm;
+
+    private Map<String, String> caracteristicas = new HashMap<String, String>();
 
     private Gson gson = new Gson();
 
@@ -45,32 +54,21 @@ public class ProdutoControllerTest {
     private TokenService tokenService;
 
     @PersistenceContext
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() throws Exception {
 
-        String novoProduto = "{\n" +
-                "    \"nome\": \"samgung a30\",\n" +
-                "    \"valor\": 1000.00,\n" +
-                "    \"quantidade\": 10,\n" +
-                "    \"descricao\": \"telefone novo com garantia de 1 ano, processador A8, memoria 8GB, 64GB armazenamento\",\n" +
-                "    \"caracteristicas\": {\n" +
-                "            \"Processador\": \"A60\",\n" +
-                "            \"Memoria Ram\": \"64GB\",\n" +
-                "            \"Memoria Rom\": \"8GB\"\n" +
-                "    },\n" +
-                "    \"idCategoria\": 1\n" +
-                "}";
-
         UsuarioRequest usuarioUm = new UsuarioRequest("johndoe@gmail.com", "123456");
-        entityManager.persist(usuarioUm.toUsuario());
+        this.usuarioUm = usuarioUm.toUsuario();
+        entityManager.persist(this.usuarioUm);
 
         UsuarioRequest usuarioDois = new UsuarioRequest("mariadoe@gmail.com", "123456");
         entityManager.persist(usuarioDois.toUsuario());
 
         CategoriaRequest novaCategoria = new CategoriaRequest("Telefone", null);
-        entityManager.persist(novaCategoria.toCategoria(entityManager));
+        this.categoria = novaCategoria.toCategoria(entityManager);
+        entityManager.persist(categoria);
 
         UsuarioAutenticacaoRequest dadosLoginUsuarioUm = new UsuarioAutenticacaoRequest("johndoe@gmail.com", "123456");
         tokenUsuarioUm = tokenService.gerarToken(authenticationManager.authenticate(dadosLoginUsuarioUm.converter()));
@@ -78,34 +76,29 @@ public class ProdutoControllerTest {
         UsuarioAutenticacaoRequest dadosLoginUsuarioDois = new UsuarioAutenticacaoRequest("mariadoe@gmail.com", "123456");
         tokenUsuarioDois = tokenService.gerarToken(authenticationManager.authenticate(dadosLoginUsuarioDois.converter()));
 
-        mockMvc.perform(MockMvcRequestBuilders
-                .post(uri)
-                .header("Authorization", "Bearer " + tokenUsuarioUm)
-                .content(novoProduto)
-                .contentType(MediaType.APPLICATION_JSON));
+        caracteristicas.put("Processador", "A70");
+        caracteristicas.put("Memoria Rom", "128GB");
+        caracteristicas.put("Memoria Ram", "8GB");
+
+        ProdutoRequest novoProduto = new ProdutoRequest("Sangung", new BigDecimal(1000),
+                10, "telefone novo", caracteristicas, this.categoria.getId());
+
+        this.produto = novoProduto.toProduto(entityManager, this.usuarioUm);
+        entityManager.persist(this.produto);
+
     }
 
     @Test
     @Order(1)
-    @DisplayName("200 - Cadastro de um novo produto")
     void deveriaCadastrarUmNovoProdutoComRetorno200() throws Exception {
-        String novoProduto = "{\n" +
-                "    \"nome\": \"samgung a70\",\n" +
-                "    \"valor\": 1000.00,\n" +
-                "    \"quantidade\": 10,\n" +
-                "    \"descricao\": \"telefone novo com garantia de 1 ano, processador A8, memoria 8GB, 64GB armazenamento\",\n" +
-                "    \"caracteristicas\": {\n" +
-                "            \"Processador\": \"A60\",\n" +
-                "            \"Memoria Ram\": \"64GB\",\n" +
-                "            \"Memoria Rom\": \"8GB\"\n" +
-                "    },\n" +
-                "    \"idCategoria\": 1\n" +
-                "}";
+
+        ProdutoRequest novoProduto = new ProdutoRequest("Sangung A70", new BigDecimal(1000),
+                10, "telefone novo", caracteristicas, 1L);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
                         .header("Authorization", "Bearer " + tokenUsuarioUm)
-                        .content(novoProduto)
+                        .content(gson.toJson(novoProduto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers
                         .status()
@@ -114,25 +107,15 @@ public class ProdutoControllerTest {
 
     @Test
     @Order(2)
-    @DisplayName("400 - Erro Campo nulo ou vazio")
     void naoDeveriaCadastrarUmNovoProdutoErroCampoNuloOuVazioComRetorno400() throws Exception {
-        String novoProduto = "{\n" +
-                "    \"nome\": \"\",\n" +
-                "    \"valor\": 1000.00,\n" +
-                "    \"quantidade\": 10,\n" +
-                "    \"descricao\": \"telefone novo com garantia de 1 ano, processador A8, memoria 8GB, 64GB armazenamento\",\n" +
-                "    \"caracteristicas\": {\n" +
-                "            \"Processador\": \"A60\",\n" +
-                "            \"Memoria Ram\": \"64GB\",\n" +
-                "            \"Memoria Rom\": \"8GB\"\n" +
-                "    },\n" +
-                "    \"idCategoria\": 1\n" +
-                "}";
+
+        ProdutoRequest novoProduto = new ProdutoRequest("", new BigDecimal(1000),
+                10, "telefone novo", caracteristicas, 1L);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
                         .header("Authorization", "Bearer " + tokenUsuarioUm)
-                        .content(novoProduto)
+                        .content(gson.toJson(novoProduto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers
                         .status()
@@ -141,24 +124,19 @@ public class ProdutoControllerTest {
 
     @Test
     @Order(3)
-    @DisplayName("400 - Erro Necessita de 3 caractetiristicas")
     void naoDeveriaCadastrarUmNovoProdutoErroNoMinimoTresCaracteristicasRetorno400() throws Exception {
-        String novoProduto = "{\n" +
-                "    \"nome\": \"samgung a30\",\n" +
-                "    \"valor\": 1000.00,\n" +
-                "    \"quantidade\": 10,\n" +
-                "    \"descricao\": \"telefone novo com garantia de 1 ano, processador A8, memoria 8GB, 64GB armazenamento\",\n" +
-                "    \"caracteristicas\": {\n" +
-                "            \"Processador\": \"A60\",\n" +
-                "            \"Memoria Ram\": \"64GB\",\n" +
-                "    },\n" +
-                "    \"idCategoria\": 1\n" +
-                "}";
+
+        Map<String, String> necessitaTresCaracteristicas = new HashMap<>();
+        necessitaTresCaracteristicas.put("Processador", "A70");
+        necessitaTresCaracteristicas.put("Memoria Rom", "128GB");
+
+        ProdutoRequest novoProduto = new ProdutoRequest("Sangung A70", new BigDecimal(1000),
+                10, "telefone novo", necessitaTresCaracteristicas, 1L);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
                         .header("Authorization", "Bearer " + tokenUsuarioUm)
-                        .content(novoProduto)
+                        .content(gson.toJson(novoProduto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers
                         .status()
@@ -167,25 +145,15 @@ public class ProdutoControllerTest {
 
     @Test
     @Order(4)
-    @DisplayName("400 - Categoria inexistente")
     void naoDeveriaCadastrarUmNovoProdutoComCategoriaInexistenteRetorno400() throws Exception {
-        String novoProduto = "{\n" +
-                "    \"nome\": \"samgung a30\",\n" +
-                "    \"valor\": 1000.00,\n" +
-                "    \"quantidade\": 10,\n" +
-                "    \"descricao\": \"telefone novo com garantia de 1 ano, processador A8, memoria 8GB, 64GB armazenamento\",\n" +
-                "    \"caracteristicas\": {\n" +
-                "            \"Processador\": \"A60\",\n" +
-                "            \"Memoria Ram\": \"64GB\",\n" +
-                "            \"Memoria Rom\": \"8GB\"\n" +
-                "    },\n" +
-                "    \"idCategoria\": 10\n" +
-                "}";
+
+        ProdutoRequest novoProduto = new ProdutoRequest("Sangung A70", new BigDecimal(1000),
+                10, "telefone novo", caracteristicas, 10L);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
                         .header("Authorization", "Bearer " + tokenUsuarioUm)
-                        .content(novoProduto)
+                        .content(gson.toJson(novoProduto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers
                         .status()
@@ -194,25 +162,14 @@ public class ProdutoControllerTest {
 
     @Test
     @Order(5)
-    @DisplayName("403 - Acesso Negado")
     void naoDeveriaCadastrarUmNovoProdutoErroAcessoNegadoComRetorno403() throws Exception {
-        String novoProduto = "{\n" +
-                "    \"nome\": \"samgung a30\",\n" +
-                "    \"valor\": 1000.00,\n" +
-                "    \"quantidade\": 10,\n" +
-                "    \"descricao\": \"telefone novo com garantia de 1 ano, processador A8, memoria 8GB, 64GB armazenamento\",\n" +
-                "    \"caracteristicas\": {\n" +
-                "            \"Processador\": \"A60\",\n" +
-                "            \"Memoria Ram\": \"64GB\",\n" +
-                "            \"Memoria Rom\": \"8GB\"\n" +
-                "    },\n" +
-                "    \"idCategoria\": 1\n" +
-                "}";
+        ProdutoRequest novoProduto = new ProdutoRequest("Sangung A70", new BigDecimal(1000),
+                10, "telefone novo", caracteristicas, 1L);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
-                        .header("Authorization", "Bearer ")
-                        .content(novoProduto)
+                        .header("Authorization", "Bearer " + "token_invalido")
+                        .content(gson.toJson(novoProduto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers
                         .status()
@@ -221,10 +178,9 @@ public class ProdutoControllerTest {
 
     @Test
     @Order(6)
-    @DisplayName("200 - Upload de Imagens")
     void deveridaEnviarImagensDoProdutoDoUsuarioLogadoComRetorno200() throws Exception {
 
-        String uriImagem = "/api/v1/produtos/" + 1L + "/imagens";
+        String uriImagem = "/api/v1/produtos/" + this.produto.getId() + "/imagens";
 
         MockMultipartFile imagem = new MockMultipartFile("imagens", getClass().getResourceAsStream("imagem.png"));
 
@@ -236,7 +192,6 @@ public class ProdutoControllerTest {
 
     @Test
     @Order(7)
-    @DisplayName("400 - Erro - necessita enviar ao menos uma imagem")
     void naoDeveridaEnviarImagensSemImagensDoProdutoDoUsuarioLogadoComRetorno400() throws Exception {
 
         String uriImagem = "/api/v1/produtos/" + 1L + "/imagens";
@@ -251,10 +206,9 @@ public class ProdutoControllerTest {
 
     @Test
     @Order(8)
-    @DisplayName("403 - Não envia imagem de outro usuario logado")
     void naoDeveridaEnviarImagensDoProdutoDoUsuarioLogadoComRetorno403() throws Exception {
 
-        String uriImagem = "/api/v1/produtos/" + 1L + "/imagens";
+        String uriImagem = "/api/v1/produtos/" + this.produto.getId() + "/imagens";
 
         MockMultipartFile imagem = new MockMultipartFile("imagens", getClass().getResourceAsStream("imagem.png"));
 
@@ -266,7 +220,6 @@ public class ProdutoControllerTest {
 
     @Test
     @Order(9)
-    @DisplayName("403 - Token invalido")
     void naoDeveridaEnviarImagensDoProdutoDoUsuarioLogadoComTokenInvalidoComRetorno403() throws Exception {
 
         String uriImagem = "/api/v1/produtos/" + 1L + "/imagens";

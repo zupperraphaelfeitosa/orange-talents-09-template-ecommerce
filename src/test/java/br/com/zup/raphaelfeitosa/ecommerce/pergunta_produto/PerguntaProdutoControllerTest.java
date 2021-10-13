@@ -1,7 +1,11 @@
 package br.com.zup.raphaelfeitosa.ecommerce.pergunta_produto;
 
 import br.com.zup.raphaelfeitosa.ecommerce.categoria.Categoria;
+import br.com.zup.raphaelfeitosa.ecommerce.categoria.CategoriaRequest;
 import br.com.zup.raphaelfeitosa.ecommerce.config.security.TokenService;
+import br.com.zup.raphaelfeitosa.ecommerce.produto.Produto;
+import br.com.zup.raphaelfeitosa.ecommerce.produto.ProdutoRequest;
+import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
 import br.com.zup.raphaelfeitosa.ecommerce.usuario.UsuarioAutenticacaoRequest;
 import br.com.zup.raphaelfeitosa.ecommerce.usuario.UsuarioRequest;
 import com.google.gson.Gson;
@@ -19,17 +23,23 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 @ActiveProfiles(value = "test")
-@Transactional
 public class PerguntaProdutoControllerTest {
 
     private final String uri = "/api/v1/produtos/";
     private String tokenUsuarioUm;
     private String tokenUsuarioDois;
+    private Usuario usuarioUm;
+    private Usuario usuarioDois;
+    private Categoria categoria;
+    private Produto produto;
 
     private Gson gson = new Gson();
 
@@ -48,15 +58,14 @@ public class PerguntaProdutoControllerTest {
     @BeforeEach
     void setUp() throws Exception {
 
+        this.usuarioUm = new Usuario("johndoe@gmail.com", "123456");
+        entityManager.persist(this.usuarioUm);
 
-        UsuarioRequest usuarioUm = new UsuarioRequest("johndoe@gmail.com", "123456");
-        entityManager.persist(usuarioUm.toUsuario());
+        this.usuarioDois = new Usuario("mariadoe@gmail.com", "123456");
+        entityManager.persist(this.usuarioDois);
 
-        UsuarioRequest usuarioDois = new UsuarioRequest("mariadoe@gmail.com", "123456");
-        entityManager.persist(usuarioDois.toUsuario());
-
-        Categoria novaCategoria = new Categoria("Telefone", null);
-        entityManager.persist(novaCategoria);
+        this.categoria = new Categoria("Telefone", null);
+        entityManager.persist(this.categoria);
 
         UsuarioAutenticacaoRequest dadosLoginUsuarioUm = new UsuarioAutenticacaoRequest("johndoe@gmail.com", "123456");
         tokenUsuarioUm = tokenService.gerarToken(authenticationManager.authenticate(dadosLoginUsuarioUm.converter()));
@@ -64,35 +73,24 @@ public class PerguntaProdutoControllerTest {
         UsuarioAutenticacaoRequest dadosLoginUsuarioDois = new UsuarioAutenticacaoRequest("mariadoe@gmail.com", "123456");
         tokenUsuarioDois = tokenService.gerarToken(authenticationManager.authenticate(dadosLoginUsuarioDois.converter()));
 
-        String novoProduto = "{\n" +
-                "    \"nome\": \"samgung a30\",\n" +
-                "    \"valor\": 1000.00,\n" +
-                "    \"quantidade\": 10,\n" +
-                "    \"descricao\": \"telefone novo com garantia de 1 ano, processador A8, memoria 8GB, 64GB armazenamento\",\n" +
-                "    \"caracteristicas\": {\n" +
-                "            \"Processador\": \"A60\",\n" +
-                "            \"Memoria Ram\": \"64GB\",\n" +
-                "            \"Memoria Rom\": \"8GB\"\n" +
-                "    },\n" +
-                "    \"idCategoria\": 1\n" +
-                "}";
+        Map<String, String> caracteristicas = new HashMap<String, String>();
+        caracteristicas.put("Processador", "A70");
+        caracteristicas.put("Memoria Rom", "128GB");
+        caracteristicas.put("Memoria Ram", "8GB");
 
-        mockMvc.perform(MockMvcRequestBuilders
-                .post(uri)
-                .header("Authorization", "Bearer " + tokenUsuarioUm)
-                .content(novoProduto)
-                .contentType(MediaType.APPLICATION_JSON));
+        this.produto = new Produto("Sangung", new BigDecimal(1000), 10, "telefone novo", caracteristicas, this.categoria, this.usuarioUm);
+        entityManager.persist(this.produto);
     }
 
     @Test
     @Order(1)
-    @DisplayName("200 - Cadastro de uma nova pergunta para o produto com envio de email")
+    @Transactional
     void deveriaCadastrarUmaNovaPerguntaDeProdutoComRetorno200() throws Exception {
 
         PerguntaProdutoRequest novaPerguntaProduto = new PerguntaProdutoRequest("Nova pergunta para o produto");
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .post(uri + 1L + "/perguntas")
+                        .post(uri + this.produto.getId() + "/perguntas")
                         .header("Authorization", "Bearer " + tokenUsuarioDois)
                         .content(gson.toJson(novaPerguntaProduto))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -103,13 +101,13 @@ public class PerguntaProdutoControllerTest {
 
     @Test
     @Order(2)
-    @DisplayName("400 - Erro campo nulo ou invalido")
+    @Transactional
     void naoDeveriaCadastrarUmaNovaPerguntaDeProdutoComCompoNuloOuInvalidoRetorno400() throws Exception {
 
         PerguntaProdutoRequest novaPerguntaProduto = new PerguntaProdutoRequest("");
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .post(uri + 1L + "/perguntas")
+                        .post(uri + this.produto.getId() + "/perguntas")
                         .header("Authorization", "Bearer " + tokenUsuarioDois)
                         .content(gson.toJson(novaPerguntaProduto))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -120,7 +118,7 @@ public class PerguntaProdutoControllerTest {
 
     @Test
     @Order(3)
-    @DisplayName("404 - Error id do produto na url invalido")
+    @Transactional
     void naoDeveriaCadastrarNovaPerguntaDeProdutoComIdProdutoInvalidoComRetorno404() throws Exception {
 
         PerguntaProdutoRequest novaPerguntaProduto = new PerguntaProdutoRequest("Nova pergunta para o produto");
@@ -137,13 +135,13 @@ public class PerguntaProdutoControllerTest {
 
     @Test
     @Order(4)
-    @DisplayName("403 - Usuário dono do produto nao pode realizar pergunta no proprio produto")
+    @Transactional
     void donoDoProdutoNaoPodeCadastrarOpniaoComRetorno403() throws Exception {
 
         PerguntaProdutoRequest novaPerguntaProduto = new PerguntaProdutoRequest("Nova pergunta para o produto");
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .post(uri + 1L + "/perguntas")
+                        .post(uri + this.produto.getId() + "/perguntas")
                         .header("Authorization", "Bearer " + tokenUsuarioUm)
                         .content(gson.toJson(novaPerguntaProduto))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -154,13 +152,13 @@ public class PerguntaProdutoControllerTest {
 
     @Test
     @Order(5)
-    @DisplayName("403 - Erro forbidden token invalido")
+    @Transactional
     void naoDeveriaCadastrarPerguntaComTokenInvalidoComRetorno403() throws Exception {
 
         PerguntaProdutoRequest novaPerguntaProduto = new PerguntaProdutoRequest("Nova pergunta para o produto");
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .post(uri + 1L + "/perguntas")
+                        .post(uri + this.produto.getId() + "/perguntas")
                         .header("Authorization", "Bearer " + "token_invalido")
                         .content(gson.toJson(novaPerguntaProduto))
                         .contentType(MediaType.APPLICATION_JSON))

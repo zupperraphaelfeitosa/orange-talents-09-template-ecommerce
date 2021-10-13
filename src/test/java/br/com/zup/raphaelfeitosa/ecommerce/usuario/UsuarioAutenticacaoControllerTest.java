@@ -34,7 +34,6 @@ public class UsuarioAutenticacaoControllerTest {
 
     @Test
     @Order(1)
-    @DisplayName("200 - usuario autenticado com sucesso")
     @Transactional
     void deveriaRealizarLoginComSucessoRetorno200() throws Exception {
 
@@ -55,7 +54,6 @@ public class UsuarioAutenticacaoControllerTest {
 
     @Test
     @Order(2)
-    @DisplayName("400 - Error email invalido")
     @Transactional
     void deveriaRetornarErrorDeEmailInvalidoComRetorno400() throws Exception {
 
@@ -72,7 +70,6 @@ public class UsuarioAutenticacaoControllerTest {
 
     @Test
     @Order(3)
-    @DisplayName("400 - Error email ou senha em vazio ou nulo")
     @Transactional
     void deveriaRetornarErrorDeEmailOuSenhaVazioOuNuloComRetorno400() throws Exception {
 

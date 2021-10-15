@@ -41,6 +41,10 @@ public class OpiniaoProdutoController {
 
         OpiniaoProduto novaOpiniaoProduto = opiniaoProdutoRequest.toOpiniaoProduto(produto, usuario.get());
 
+        if(novaOpiniaoProduto.usuarioJaDeuOpiniao(usuario)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você já deu opiniao neste produto");
+        }
+
         entityManager.persist(novaOpiniaoProduto);
     }
 }

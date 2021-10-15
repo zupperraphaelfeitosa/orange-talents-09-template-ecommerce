@@ -1,8 +1,5 @@
 package br.com.zup.raphaelfeitosa.ecommerce.produto;
 
-import br.com.zup.raphaelfeitosa.ecommerce.imagem_produto.EnvioDeImagens;
-import br.com.zup.raphaelfeitosa.ecommerce.usuario.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,12 +18,6 @@ public class ProdutoController {
 
     @PersistenceContext
     EntityManager entityManager;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private EnvioDeImagens fakeDeEnvioDeImagens;
 
     @PostMapping
     @Transactional

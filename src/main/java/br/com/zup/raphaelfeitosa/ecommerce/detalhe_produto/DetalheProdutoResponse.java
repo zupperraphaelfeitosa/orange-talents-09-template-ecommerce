@@ -42,7 +42,7 @@ public class DetalheProdutoResponse {
         this.nome = produto.getNome();
         this.preco = produto.getValor();
         this.descricao = produto.getDescricao();
-        this.estoque = produto.getQuantidade();
+        this.estoque = produto.getQuantidadeDisponivel();
         this.caracteristicas = produto.getCaracteristicas();
         this.imagens = produto.getImagens()
                 .stream()

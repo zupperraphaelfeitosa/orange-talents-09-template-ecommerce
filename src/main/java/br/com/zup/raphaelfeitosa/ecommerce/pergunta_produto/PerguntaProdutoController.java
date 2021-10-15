@@ -49,6 +49,6 @@ public class PerguntaProdutoController {
         PerguntaProduto novaPergunta = perguntaProdutoRequest.toPerguntaProduto(produto, usuario.get());
 
         entityManager.persist(novaPergunta);
-        envioEmail.envia(novaPergunta.getProduto().getUsuario().getEmail(), novaPergunta.getProduto().getNome(), novaPergunta.getTitulo());
+        envioEmail.enviaEmailPergunta(novaPergunta);
     }
 }

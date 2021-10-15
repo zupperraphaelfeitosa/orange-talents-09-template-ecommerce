@@ -1,5 +1,6 @@
 package br.com.zup.raphaelfeitosa.ecommerce.validacao.handler;
 
+import br.com.zup.raphaelfeitosa.ecommerce.validacao.handler.exception.ExcecaoEstoqueIndisponivel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 public class ErrorValidacaoHandler {
@@ -53,4 +55,12 @@ public class ErrorValidacaoHandler {
         });
         return errorDeValidacaoDtoList;
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ExcecaoEstoqueIndisponivel.class)
+    public Map<String, String> handlerExcecaoEstoqueIndisponivel(ExcecaoEstoqueIndisponivel exception) {
+        return Map.of("message:", exception.getMessage());
+
+    }
+
 }

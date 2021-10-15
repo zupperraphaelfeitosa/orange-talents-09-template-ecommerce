@@ -5,12 +5,12 @@ import br.com.zup.raphaelfeitosa.ecommerce.imagem_produto.ImagemProduto;
 import br.com.zup.raphaelfeitosa.ecommerce.opiniao_produto.OpiniaoProduto;
 import br.com.zup.raphaelfeitosa.ecommerce.pergunta_produto.PerguntaProduto;
 import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
+import br.com.zup.raphaelfeitosa.ecommerce.validacao.handler.exception.ExcecaoEstoqueIndisponivel;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Entity
@@ -28,7 +28,7 @@ public class Produto {
     private BigDecimal valor;
 
     @Column(nullable = false)
-    private Integer quantidade;
+    private Integer quantidadeDisponivel;
 
     @Column(nullable = false, length = 1000)
     private String descricao;
@@ -59,11 +59,11 @@ public class Produto {
     public Produto() {
     }
 
-    public Produto(String nome, BigDecimal valor, Integer quantidade, String descricao,
+    public Produto(String nome, BigDecimal valor, Integer quantidadeDisponivel, String descricao,
                    Map<String, String> caracteristicas, Categoria categoria, Usuario usuario) {
         this.nome = nome;
         this.valor = valor;
-        this.quantidade = quantidade;
+        this.quantidadeDisponivel = quantidadeDisponivel;
         this.descricao = descricao;
         this.caracteristicas = caracteristicas;
         this.categoria = categoria;
@@ -93,8 +93,8 @@ public class Produto {
         return valor;
     }
 
-    public Integer getQuantidade() {
-        return quantidade;
+    public Integer getQuantidadeDisponivel() {
+        return quantidadeDisponivel;
     }
 
     public String getDescricao() {
@@ -127,6 +127,13 @@ public class Produto {
 
     public Usuario getUsuario() {
         return usuario;
+    }
+
+    public void estoque(Integer quantidade) {
+        if (this.quantidadeDisponivel < quantidade) {
+            throw new ExcecaoEstoqueIndisponivel(this.quantidadeDisponivel);
+        }
+        quantidadeDisponivel -= quantidade;
     }
 
     @Override

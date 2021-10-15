@@ -77,8 +77,8 @@ public class Produto {
         this.imagens.addAll(imagens);
     }
 
-    public boolean pertenceAoUsuario(Optional<Usuario> possivelDonoDoProduto) {
-        return usuario.equals(possivelDonoDoProduto.get());
+    public boolean pertenceAoUsuario(Usuario possivelDonoDoProduto) {
+        return usuario.equals(possivelDonoDoProduto);
     }
 
     public Long getId() {

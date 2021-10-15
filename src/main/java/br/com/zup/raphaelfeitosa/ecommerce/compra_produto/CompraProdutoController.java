@@ -41,13 +41,14 @@ public class CompraProdutoController {
 
         Produto produto = entityManager.find(Produto.class, compraProdutoRequest.getIdProduto());
 
-        Optional<Usuario> usuario = usuarioRepository.findByEmail(usuarioLogado.getUsername());
+        Usuario usuario = usuarioRepository.findByEmail(usuarioLogado.getUsername())
+                .orElseThrow(() -> new ResponseStatusException((HttpStatus.FORBIDDEN)));
 
         if(produto.pertenceAoUsuario(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não pode realizar compra do seu proprio produto");
         }
 
-        CompraProduto novaCompra = compraProdutoRequest.toCompraProduto(produto, usuario.get());
+        CompraProduto novaCompra = compraProdutoRequest.toCompraProduto(produto, usuario);
 
         produto.estoque(compraProdutoRequest.getQuantidade());
 

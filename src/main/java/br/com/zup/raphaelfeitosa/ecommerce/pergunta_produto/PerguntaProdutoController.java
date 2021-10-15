@@ -40,13 +40,14 @@ public class PerguntaProdutoController {
         Produto produto = Optional.ofNullable(entityManager.find(Produto.class, id))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não existente"));
 
-        Optional<Usuario> usuario = usuarioRepository.findByEmail(usuarioLogado.getUsername());
+        Usuario usuario = usuarioRepository.findByEmail(usuarioLogado.getUsername())
+                .orElseThrow(() -> new ResponseStatusException((HttpStatus.FORBIDDEN)));
 
         if (produto.pertenceAoUsuario(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario não pode realizar pergunta no seu proprio produto");
         }
 
-        PerguntaProduto novaPergunta = perguntaProdutoRequest.toPerguntaProduto(produto, usuario.get());
+        PerguntaProduto novaPergunta = perguntaProdutoRequest.toPerguntaProduto(produto, usuario);
 
         entityManager.persist(novaPergunta);
         envioEmail.enviaEmailPergunta(novaPergunta);

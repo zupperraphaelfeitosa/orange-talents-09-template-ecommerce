@@ -33,13 +33,15 @@ public class OpiniaoProdutoController {
                                 @AuthenticationPrincipal UserDetails usuarioLogado) {
         Produto produto = Optional.ofNullable(entityManager.find(Produto.class, id))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não Existe"));
-        Optional<Usuario> usuario = usuarioRepository.findByEmail(usuarioLogado.getUsername());
+
+        Usuario usuario = usuarioRepository.findByEmail(usuarioLogado.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
 
         if (produto.pertenceAoUsuario(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario não pode da opinião no seu proprio produto");
         }
 
-        OpiniaoProduto novaOpiniaoProduto = opiniaoProdutoRequest.toOpiniaoProduto(produto, usuario.get());
+        OpiniaoProduto novaOpiniaoProduto = opiniaoProdutoRequest.toOpiniaoProduto(produto, usuario);
 
         entityManager.persist(novaOpiniaoProduto);
     }

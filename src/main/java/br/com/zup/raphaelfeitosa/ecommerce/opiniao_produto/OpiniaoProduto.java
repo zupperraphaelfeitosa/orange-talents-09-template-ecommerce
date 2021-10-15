@@ -43,10 +43,6 @@ public class OpiniaoProduto {
         this.usuario = usuario;
     }
 
-    public boolean usuarioJaDeuOpiniao(Optional<Usuario> possivelDonoDaOpiniao) {
-        return usuario.equals(possivelDonoDaOpiniao.get());
-    }
-
     public Integer getNota() {
         return nota;
     }
@@ -59,18 +55,6 @@ public class OpiniaoProduto {
         return descricao;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OpiniaoProduto that = (OpiniaoProduto) o;
-        return usuario.equals(that.usuario);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(usuario);
-    }
 }
 
 

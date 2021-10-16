@@ -26,3 +26,27 @@ link:
 email:
   fake:
     remetente: no-reply@ecommerce.com.br
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+        exclude: env,beans
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      aplicacao: ${NOME_DA_APLICACAO:ecommerce}
+      ambiente: ${AMBIENTE:desenvolvimento}
+
+
+
+#Utilizando CORS
+#management:
+#  endpoints:
+#    web:
+#      cors:
+#        allowed-origins: "https://example.com"
+#        allowed-methods: "GET,POST"
+

@@ -44,7 +44,7 @@ public class Usuario implements UserDetails {
         this.senha = encriptarSenha(senha);
     }
 
-    private static String encriptarSenha(String senha) {
+    private String encriptarSenha(String senha) {
         return new BCryptPasswordEncoder().encode(senha);
     }
 

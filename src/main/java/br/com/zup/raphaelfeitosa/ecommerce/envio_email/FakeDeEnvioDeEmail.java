@@ -40,4 +40,32 @@ public class FakeDeEnvioDeEmail implements EnvioEmail {
         System.out.println("Data da compra: " + compraProduto.getDataCompra());
         System.out.println("Email vendedor: " + compraProduto.getProduto().getUsuario().getEmail());
     }
+
+    @Override
+    public void enviaEmailCompraSucesso(CompraProduto compraProduto) {
+        System.out.println("Novo email recebido!!!");
+        System.out.println("Remetente: " + fakeRemetente);
+        System.out.println("Destinatario: " + compraProduto.getUsuario().getEmail());
+        System.out.println("Assunto: Pagamento do " + compraProduto.getProduto().getNome() + " Finalizado!");
+        System.out.println("---------------------------------------------");
+        System.out.println("Resumo da compra");
+        System.out.println("Gateway pagamento: " + compraProduto.getGateway());
+        System.out.println("Status da transação: " + compraProduto.getStatusCompra());
+        System.out.println("Data da compra: " + compraProduto.getDataCompra());
+        System.out.println("Email vendedor: " + compraProduto.getProduto().getUsuario().getEmail());
+    }
+
+    @Override
+    public void enviaEmailCompraErro(CompraProduto compraProduto) {
+        System.out.println("Novo email recebido!!!");
+        System.out.println("Remetente: " + fakeRemetente);
+        System.out.println("Destinatario: " + compraProduto.getUsuario().getEmail());
+        System.out.println("Assunto: Pagamento do " + compraProduto.getProduto().getNome() + " Recusado!");
+        System.out.println("---------------------------------------------");
+        System.out.println("Resumo da compra");
+        System.out.println("Gateway pagamento: " + compraProduto.getGateway());
+        System.out.println("Status do pagamento: Recusado!");
+        System.out.println("Data da compra: " + compraProduto.getDataCompra());
+        System.out.println("Email vendedor: " + compraProduto.getProduto().getUsuario().getEmail());
+    }
 }

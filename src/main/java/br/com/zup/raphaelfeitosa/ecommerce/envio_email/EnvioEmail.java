@@ -8,4 +8,8 @@ public interface EnvioEmail {
     void enviaEmailPergunta(PerguntaProduto perguntaProduto);
 
     void enviaEmailCompraIniciada(CompraProduto compraProduto);
+
+    void enviaEmailCompraSucesso(CompraProduto compraProduto);
+
+    void enviaEmailCompraErro(CompraProduto compraProduto);
 }

@@ -131,7 +131,9 @@ public class Produto {
 
     public void estoque(Integer quantidade) {
         if (this.quantidadeDisponivel < quantidade) {
-            throw new ExcecaoEstoqueIndisponivel(this.quantidadeDisponivel);
+            throw new ExcecaoEstoqueIndisponivel(
+                    "Estoque indisponivel para a quantidade solicitada no momento! Quantidade atual: ",
+                    this.quantidadeDisponivel);
         }
         quantidadeDisponivel -= quantidade;
     }

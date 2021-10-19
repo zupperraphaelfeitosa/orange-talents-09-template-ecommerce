@@ -1,6 +1,5 @@
 package br.com.zup.raphaelfeitosa.ecommerce.imagem_produto;
 
-import br.com.zup.raphaelfeitosa.ecommerce.imagem_produto.EnvioDeImagens;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;

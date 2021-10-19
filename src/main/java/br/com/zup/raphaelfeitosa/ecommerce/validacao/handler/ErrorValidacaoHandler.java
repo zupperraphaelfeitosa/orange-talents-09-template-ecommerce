@@ -1,6 +1,7 @@
 package br.com.zup.raphaelfeitosa.ecommerce.validacao.handler;
 
 import br.com.zup.raphaelfeitosa.ecommerce.validacao.handler.exception.ExcecaoEstoqueIndisponivel;
+import br.com.zup.raphaelfeitosa.ecommerce.validacao.handler.exception.ExcecaoPagamentoInvalido;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -33,7 +34,7 @@ public class ErrorValidacaoHandler {
             ErrorDeValidacaoDto error = new ErrorDeValidacaoDto(erros.getField(), mensagem);
             errorDeValidacaoDtoList.add(error);
         });
-        //retorna erro do objeto quando criamos nossa anotação e anotamos a classe Request/DTO
+
         List<ObjectError> objectErrors = exception.getBindingResult().getGlobalErrors();
         objectErrors.forEach(erros -> {
             String mensagem = messageSource.getMessage(erros, LocaleContextHolder.getLocale());
@@ -59,7 +60,13 @@ public class ErrorValidacaoHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ExcecaoEstoqueIndisponivel.class)
     public Map<String, String> handlerExcecaoEstoqueIndisponivel(ExcecaoEstoqueIndisponivel exception) {
-        return Map.of("message:", exception.getMessage());
+        return Map.of("messagem:", exception.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ExcecaoPagamentoInvalido.class)
+    public Map<String, String> handlerExcecaoPagamentoInvalido(ExcecaoPagamentoInvalido exception) {
+        return Map.of("messagem:", exception.getMessage());
 
     }
 

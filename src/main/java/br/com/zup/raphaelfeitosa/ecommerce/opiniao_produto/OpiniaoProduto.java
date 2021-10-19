@@ -4,8 +4,6 @@ import br.com.zup.raphaelfeitosa.ecommerce.produto.Produto;
 import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
 
 import javax.persistence.*;
-import java.util.Objects;
-import java.util.Optional;
 
 @Entity
 @Table(name = "tb_opinoes_produtos")
@@ -33,7 +31,8 @@ public class OpiniaoProduto {
     private Usuario usuario;
 
     @Deprecated
-    public OpiniaoProduto(){}
+    public OpiniaoProduto() {
+    }
 
     public OpiniaoProduto(Integer nota, String titulo, String descricao, Produto produto, Usuario usuario) {
         this.nota = nota;

@@ -17,7 +17,6 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/compras")
@@ -42,9 +41,9 @@ public class CompraProdutoController {
         Produto produto = entityManager.find(Produto.class, compraProdutoRequest.getIdProduto());
 
         Usuario usuario = usuarioRepository.findByEmail(usuarioLogado.getUsername())
-                .orElseThrow(() -> new ResponseStatusException((HttpStatus.FORBIDDEN)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
 
-        if(produto.pertenceAoUsuario(usuario)) {
+        if (produto.pertenceAoUsuario(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuário não pode realizar compra do seu proprio produto");
         }
 

@@ -2,15 +2,19 @@ package br.com.zup.raphaelfeitosa.ecommerce.compra_produto;
 
 import br.com.zup.raphaelfeitosa.ecommerce.compra_produto.enums.Gateway;
 import br.com.zup.raphaelfeitosa.ecommerce.compra_produto.enums.StatusCompra;
+import br.com.zup.raphaelfeitosa.ecommerce.pagamento.Pagamento;
+import br.com.zup.raphaelfeitosa.ecommerce.pagamento.enums.StatusPagamento;
 import br.com.zup.raphaelfeitosa.ecommerce.produto.Produto;
 import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
-import org.hibernate.id.GUIDGenerator;
+import br.com.zup.raphaelfeitosa.ecommerce.validacao.handler.exception.ExcecaoPagamentoInvalido;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -45,11 +49,18 @@ public class CompraProduto {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     @Column(nullable = false)
     private StatusCompra statusCompra;
 
+    @OneToMany(mappedBy = "compra", cascade = CascadeType.MERGE)
+    private List<Pagamento> pagamentos = new ArrayList<>();
+
     private LocalDateTime dataCompra = LocalDateTime.now();
+
+    @Deprecated
+    public CompraProduto() {
+    }
 
     public CompraProduto(Integer quantidade, Gateway gateway, Produto produto, Usuario usuario) {
         this.quantidade = quantidade;
@@ -106,11 +117,27 @@ public class CompraProduto {
         return gateway.urlResponse(this, uriBuilder);
     }
 
-    public BigDecimal valorTotal(Integer quantidade, BigDecimal valorMomentoAtual) {
+    private BigDecimal valorTotal(Integer quantidade, BigDecimal valorMomentoAtual) {
         return valorMomentoAtual.multiply(new BigDecimal(quantidade));
     }
 
-    public String gerarUUIDTransacao() {
+    private String gerarUUIDTransacao() {
         return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    public void verificaPagamentoProcessado() {
+
+        if (pagamentos.isEmpty()) {
+            return;
+        }
+        for (Pagamento pagamento : pagamentos) {
+            if (pagamento.getStatusPagamento().equals(StatusPagamento.SUCESSO)) {
+                throw new ExcecaoPagamentoInvalido("Pagamento já processado!");
+            }
+        }
+    }
+
+    public void alteraStatusDaCompra(StatusCompra statusCompra) {
+        this.statusCompra = statusCompra;
     }
 }

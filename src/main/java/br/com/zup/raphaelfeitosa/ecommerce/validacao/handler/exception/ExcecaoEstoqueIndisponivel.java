@@ -1,8 +1,9 @@
 package br.com.zup.raphaelfeitosa.ecommerce.validacao.handler.exception;
 
 public class ExcecaoEstoqueIndisponivel  extends RuntimeException{
+    private static final long serialVersionUID = 1L;
 
-    public ExcecaoEstoqueIndisponivel(Integer quantidadeEstoqueDisponivel) {
-        super("Estoque indisponivel para a quantidade solicitada no momento! Quantidade Atual: " + quantidadeEstoqueDisponivel);
+    public ExcecaoEstoqueIndisponivel(String mensagem, Integer quantidadeEstoqueDisponivel) {
+        super(mensagem + quantidadeEstoqueDisponivel);
     }
 }

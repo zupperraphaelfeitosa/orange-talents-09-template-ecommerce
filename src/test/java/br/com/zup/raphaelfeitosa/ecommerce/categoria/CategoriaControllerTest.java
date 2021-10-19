@@ -1,11 +1,15 @@
 package br.com.zup.raphaelfeitosa.ecommerce.categoria;
 
+import br.com.zup.raphaelfeitosa.ecommerce.config.security.TokenService;
+import br.com.zup.raphaelfeitosa.ecommerce.usuario.Usuario;
+import br.com.zup.raphaelfeitosa.ecommerce.usuario.UsuarioAutenticacaoRequest;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -23,20 +27,34 @@ import javax.transaction.Transactional;
 public class CategoriaControllerTest {
 
     private final String uri = "/api/v1/categorias";
+    private Usuario usuario;
     private Categoria categoria;
+    private String token;
 
     Gson gson = new Gson();
 
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private TokenService tokenService;
+
     @PersistenceContext
     private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
+        this.usuario = new Usuario("johndoe@gmail.com", "123456");
+        this. entityManager.persist(this.usuario);
+
         this.categoria = new Categoria("Telefone", null);
-        entityManager.persist(this.categoria);
+        this. entityManager.persist(this.categoria);
+
+        UsuarioAutenticacaoRequest dadosLoginUsuarioUm = new UsuarioAutenticacaoRequest("johndoe@gmail.com", "123456");
+        token = tokenService.gerarToken(authenticationManager.authenticate(dadosLoginUsuarioUm.converter()));
     }
 
     @Test
@@ -50,6 +68,7 @@ public class CategoriaControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
+                        .header("Authorization", "Bearer " + token)
                         .content(gson.toJson(novaCategoriaSemCategoriaMae))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers
@@ -68,6 +87,7 @@ public class CategoriaControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
+                        .header("Authorization", "Bearer " + token)
                         .content(gson.toJson(novaCategoriaComCategoriaMae))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers
@@ -86,6 +106,7 @@ public class CategoriaControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(uri)
+                        .header("Authorization", "Bearer " + token)
                         .content(gson.toJson(novaCategoriaExistente))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers
